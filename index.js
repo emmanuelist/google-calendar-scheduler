@@ -8,3 +8,11 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URL = process.env.REDIRECT_URL;
 const API_KEY = process.env.API_KEY;
+
+app.get('/', (req, res) => {
+	res.send('Hello World!');
+});
+
+app.listen(PORT, () => {
+	console.log(`Server is running on port ${PORT}`);
+});
