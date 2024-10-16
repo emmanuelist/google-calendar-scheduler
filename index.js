@@ -26,6 +26,12 @@ app.get('/auth', (req, res) => {
 	res.redirect(url);
 });
 
+app.get("/auth/redirect", async (req, res) => {
+	const { tokens } = await oauth2Client.getToken(req.query.code);
+	oauth2Client.setCredentials(tokens);
+	res.send('Authentication successful! Please return to the console.');
+});
+
 app.listen(port, () => {
 	console.log(`Server running on port ${port}`);
 });
