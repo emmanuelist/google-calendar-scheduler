@@ -1,18 +1,21 @@
-require('dotenv').config();
-
 const express = require('express');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 const app = express();
+const port = process.env.PORT || 8000;
 
-const PORT = process.env.PORT || 8000;
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URL = process.env.REDIRECT_URL;
-const API_KEY = process.env.API_KEY;
+const { google } = require('googleapis');
 
-app.get('/', (req, res) => {
-	res.send('Hello World!');
-});
+const oauth2Client = new google.auth.OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    process.env.REDIRECT_URL
+);
 
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
+const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
