@@ -65,3 +65,25 @@ async function loadTokens() {
         return null;
     }
 }
+
+// Function to check and refresh tokens if needed
+async function ensureValidToken() {
+    try {
+        const tokens = await loadTokens();
+        if (!tokens) {
+            throw new Error('No tokens found');
+        }
+
+        oauth2Client.setCredentials(tokens);
+
+        // Check if token is expired or will expire soon
+        if (oauth2Client.isTokenExpiring()) {
+            const { credentials } = await oauth2Client.refreshToken(tokens.refresh_token);
+            await saveTokens(credentials);
+            oauth2Client.setCredentials(credentials);
+        }
+    } catch (err) {
+        console.error('Error ensuring valid token:', err);
+        throw err;
+    }
+}
