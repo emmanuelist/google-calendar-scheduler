@@ -165,4 +165,22 @@ const CalendarEventForm = () => {
               required
             />
           </div>
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Time Zone
+          </label>
+          <select
+            name="timeZone"
+            value={formData.timeZone}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="Africa/Lagos">Africa/Lagos</option>
+            <option value="UTC">UTC</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="Asia/Dubai">Asia/Dubai</option>
+          </select>
+        </div>
         </div>
