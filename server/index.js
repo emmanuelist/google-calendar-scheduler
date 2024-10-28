@@ -142,3 +142,88 @@ async function checkAuth(req, res, next) {
         });
     }
 }
+
+app.get('/create-event', async (req, res) => {
+    const {
+        summary,
+        location,
+        description,
+        startDateTime,
+        endDateTime,
+        timeZone,
+        attendees
+    } = req.query;
+
+    if (!startDateTime || !endDateTime || !timeZone) {
+        return res.status(400).send({
+            status: 400,
+            message: 'Missing required query parameters'
+        });
+    }
+
+    let attendeesList = [];
+    try {
+        attendeesList = JSON.parse(attendees).map(email => ({ email }));
+    } catch (error) {
+        console.error('Error parsing attendees:', error);
+        return res.status(400).send({
+            status: 400,
+            message: 'Invalid attendees format'
+        });
+    }
+
+    const event = {
+        summary: summary || 'Tech Talk with Emmanuel',
+        location: location || 'Google Meet',
+        description: description || "Calendar event",
+        start: {
+            dateTime: new Date(startDateTime).toISOString(),
+            timeZone: timeZone
+        },
+        end: {
+            dateTime: new Date(endDateTime).toISOString(),
+            timeZone: timeZone
+        },
+        colorId: 1,
+        conferenceData: {
+            createRequest: {
+                requestId: uuid(),
+                conferenceSolutionKey: { type: 'hangoutsMeet' }
+            }
+        },
+        attendees: attendeesList,
+        reminders: {
+            useDefault: false,
+            overrides: [
+                { method: 'email', minutes: 24 * 60 },
+                { method: 'popup', minutes: 30 }
+            ]
+        }
+    };
+
+    console.log('Event payload:', JSON.stringify(event, null, 2));
+
+    try {
+        const result = await calendar.events.insert({
+            calendarId: 'primary',
+            auth: oauth2Client,
+            conferenceDataVersion: 1,
+            sendUpdates: 'all',
+            resource: event
+        });
+
+        res.send({
+            status: 200,
+            message: 'Event created',
+            link: result.data.hangoutLink,
+            eventId: result.data.id
+        });
+    } catch (err) {
+        console.error('Error creating event:', err);
+        res.status(500).send({
+            status: 500,
+            message: 'Error creating event',
+            error: err.message
+        });
+    }
+});
