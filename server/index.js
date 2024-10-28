@@ -44,3 +44,24 @@ let oauth2Client;
         oauth2Client.setCredentials(tokens);
     }
 })();
+
+// Function to save tokens
+async function saveTokens(tokens) {
+    try {
+        await fs.writeFile(TOKENS_PATH, JSON.stringify(tokens));
+        console.log('Tokens stored to', TOKENS_PATH);
+    } catch (err) {
+        console.error('Error saving tokens:', err);
+    }
+}
+
+// Function to load tokens
+async function loadTokens() {
+    try {
+        const tokens = await fs.readFile(TOKENS_PATH);
+        return JSON.parse(tokens);
+    } catch (err) {
+        console.error('Error loading tokens:', err);
+        return null;
+    }
+}
