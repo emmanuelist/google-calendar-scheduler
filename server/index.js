@@ -98,3 +98,34 @@ app.get('/auth', (req, res) => {
     });
     res.redirect(url);
 });
+
+
+app.get("/auth/redirect", async (req, res) => {
+    try {
+        const { tokens } = await oauth2Client.getToken(req.query.code);
+        oauth2Client.setCredentials(tokens);
+        await saveTokens(tokens); // Make sure to save the tokens
+
+        // Send HTML with auto-redirect
+        res.send(`
+            <html>
+                <body>
+                    <script>
+                        setTimeout(() => {
+                            window.location.href = 'http://localhost:5173/';
+                        }, 2000); // Redirect after 2 seconds
+                    </script>
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
+                        <div style="text-align: center;">
+                            <h2>Authentication successful!</h2>
+                            <p>Redirecting to calendar form...</p>
+                        </div>
+                    </div>
+                </body>
+            </html>
+        `);
+    } catch (error) {
+        console.error('Error in auth redirect:', error);
+        res.status(500).send('Authentication failed');
+    }
+});
