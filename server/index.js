@@ -12,3 +12,35 @@ const port = process.env.PORT || 8000;
 
 // Enable CORS
 app.use(cors());
+
+const TOKENS_PATH = path.join(__dirname, 'tokens.json');
+const CREDENTIALS_PATH = path.join(__dirname, 'credentials.json');
+
+const scopes = ['https://www.googleapis.com/auth/calendar'];
+
+const { google } = require('googleapis');
+
+// Load client secrets from a local file.
+async function loadCredentials() {
+    try {
+        const content = await fs.readFile(CREDENTIALS_PATH);
+        return JSON.parse(content);
+    } catch (err) {
+        console.error('Error loading client secret file:', err);
+        throw err;
+    }
+}
+
+let oauth2Client;
+
+(async () => {
+    const credentials = await loadCredentials();
+    const { client_secret, client_id, redirect_uris } = credentials.web;
+    oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
+    // Load tokens if they exist
+    const tokens = await loadTokens();
+    if (tokens) {
+        oauth2Client.setCredentials(tokens);
+    }
+})();
