@@ -89,3 +89,12 @@ async function ensureValidToken() {
 }
 
 const calendar = google.calendar({ version: 'v3', auth: oauth2Client, debug: true });
+
+app.get('/auth', (req, res) => {
+    const url = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: scopes,
+        prompt: 'consent' // Force to get refresh_token
+    });
+    res.redirect(url);
+});
