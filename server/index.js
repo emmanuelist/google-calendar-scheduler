@@ -5,6 +5,7 @@ const cors = require('cors');
 const fs = require('fs').promises;
 const path = require('path');
 
+
 dotenv.config();
 
 const app = express();
@@ -16,9 +17,12 @@ app.use(cors());
 const TOKENS_PATH = path.join(__dirname, 'tokens.json');
 const CREDENTIALS_PATH = path.join(__dirname, 'credentials.json');
 
+
 const scopes = ['https://www.googleapis.com/auth/calendar'];
 
 const { google } = require('googleapis');
+
+
 
 // Load client secrets from a local file.
 async function loadCredentials() {
@@ -32,6 +36,7 @@ async function loadCredentials() {
 }
 
 let oauth2Client;
+
 
 (async () => {
     const credentials = await loadCredentials();
@@ -55,6 +60,7 @@ async function saveTokens(tokens) {
     }
 }
 
+
 // Function to load tokens
 async function loadTokens() {
     try {
@@ -65,6 +71,7 @@ async function loadTokens() {
         return null;
     }
 }
+
 
 // Function to check and refresh tokens if needed
 async function ensureValidToken() {
@@ -88,6 +95,8 @@ async function ensureValidToken() {
     }
 }
 
+
+
 const calendar = google.calendar({ version: 'v3', auth: oauth2Client, debug: true });
 
 app.get('/auth', (req, res) => {
@@ -99,7 +108,7 @@ app.get('/auth', (req, res) => {
     res.redirect(url);
 });
 
-
+// Replace the existing /auth/redirect endpoint with this:
 app.get("/auth/redirect", async (req, res) => {
     try {
         const { tokens } = await oauth2Client.getToken(req.query.code);
@@ -236,4 +245,8 @@ app.get('/auth/status', async (req, res) => {
     } catch (err) {
         res.send({ status: 401, message: 'Not authenticated' });
     }
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
