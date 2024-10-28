@@ -227,3 +227,13 @@ app.get('/create-event', async (req, res) => {
         });
     }
 });
+
+// Add a status endpoint to check authentication
+app.get('/auth/status', async (req, res) => {
+    try {
+        await ensureValidToken();
+        res.send({ status: 200, message: 'Authenticated' });
+    } catch (err) {
+        res.send({ status: 401, message: 'Not authenticated' });
+    }
+});
