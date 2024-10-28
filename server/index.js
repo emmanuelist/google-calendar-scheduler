@@ -129,3 +129,16 @@ app.get("/auth/redirect", async (req, res) => {
         res.status(500).send('Authentication failed');
     }
 });
+
+// Middleware to check authentication
+async function checkAuth(req, res, next) {
+    try {
+        await ensureValidToken();
+        next();
+    } catch (error) {
+        res.status(401).send({
+            status: 401,
+            message: 'Authentication required. Please visit /auth to authenticate.'
+        });
+    }
+}
