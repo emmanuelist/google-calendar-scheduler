@@ -15,6 +15,24 @@ const CalendarEventForm = () => {
   const [status, setStatus] = useState({ message: "", isError: false });
   const [isLoading, setIsLoading] = useState(false);
 
+  // // Add to your CalendarEventForm component
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const response = await fetch("http://localhost:8000/auth/status");
+  //       const data = await response.json();
+  //       if (data.status !== 200) {
+  //         window.location.href = "http://localhost:8000/auth";
+  //       }
+  //     } catch (error) {
+  //       console.error("Error checking auth status:", error);
+  //       window.location.href = "http://localhost:8000/auth";
+  //     }
+  //   };
+
+  //   checkAuth();
+  // }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -66,14 +84,6 @@ const CalendarEventForm = () => {
     } finally {
       setIsLoading(false);
     }
-
-    };
-  
-    return (
-      <form onSubmit={handleSubmit}>
-        {/* Form fields go here */}
-      </form>
-    );
   };
 
   const handleChange = (e) => {
@@ -81,6 +91,30 @@ const CalendarEventForm = () => {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleAttendeeChange = (index, value) => {
+    setFormData((prev) => {
+      const newAttendees = [...prev.attendees];
+      newAttendees[index] = value;
+      return { ...prev, attendees: newAttendees };
+    });
+  };
+
+  const addAttendee = () => {
+    setFormData((prev) => ({
+      ...prev,
+      attendees: [...prev.attendees, ""],
+    }));
+  };
+
+  const removeAttendee = (index) => {
+    if (formData.attendees.length > 1) {
+      setFormData((prev) => ({
+        ...prev,
+        attendees: prev.attendees.filter((_, i) => i !== index),
+      }));
+    }
   };
 
   return (
@@ -93,6 +127,7 @@ const CalendarEventForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Previous form fields remain the same until the timezone select */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Event Title
@@ -165,7 +200,9 @@ const CalendarEventForm = () => {
               required
             />
           </div>
-          <div>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Time Zone
           </label>
@@ -183,7 +220,8 @@ const CalendarEventForm = () => {
             <option value="Asia/Dubai">Asia/Dubai</option>
           </select>
         </div>
-        </div>
+
+        {/* New Attendees Section */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
             Attendees
@@ -216,3 +254,33 @@ const CalendarEventForm = () => {
             <Plus className="w-4 h-4" /> Add Another Attendee
           </button>
         </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full py-2 px-4 rounded-md text-white font-medium ${
+            isLoading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600"
+          }`}
+        >
+          {isLoading ? "Creating Event..." : "Create Event"}
+        </button>
+      </form>
+
+      {status.message && (
+        <Alert
+          className={`mt-4 ${status.isError ? "bg-red-50" : "bg-green-50"}`}
+        >
+          <AlertDescription
+            className={status.isError ? "text-red-800" : "text-green-800"}
+          >
+            {status.message}
+          </AlertDescription>
+        </Alert>
+      )}
+    </div>
+  );
+};
+
+export default CalendarEventForm;
